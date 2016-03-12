@@ -6,7 +6,6 @@ import mutagen.id3
 
 import os
 import sys
-#import property_reader
 
 if len(sys.argv) > 1:
 	substringTitle = int(sys.argv[1])
