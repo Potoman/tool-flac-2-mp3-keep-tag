@@ -6,7 +6,6 @@ import mutagen.id3
 
 import os
 import sys
-#import property_reader
 
 if len(sys.argv) > 1:
 	substringTitle = int(sys.argv[1])
@@ -50,12 +49,3 @@ for subdir, dirs, files in os.walk('./'):
 			except:
 				print ("No genre")
 			mf.save()
-
-#propgenerator = property_reader.property_sets("C:\\Users\\Maxime\\Music\\ESPERANZA SPALDING Chamber Music Society FLAC\\01 - Little Fly.flac")
-#for name, properties in propgenerator:
-#	print(name)
-#	for k, v in properties.items ():
-#		print("  ", k, "=>", v)
-
-
-#vlc -I dummy "03 - Really Very Small.flac" ":sout=#transcode{acodec=mpga,ab=192}:std{dst=output.mp3,access=file}" vlc://quit
