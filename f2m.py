@@ -6,11 +6,11 @@ import mutagen.id3
 import os
 import sys
 
-if len(sys.argv) > 1:
-	substringTitle = int(sys.argv[1])
-	print("Remove first " + str(substringTitle) + " caracter.")
-else:
-	substringTitle = 0
+transcode = {'mp3': 'acodec=mpga,ab=192', 'wav': 'acodec=s16l,channels=2', 'alac': 'acodec=alac,channels=2,samplerate=44100'}
+std = {'mp3': 'access=file', 'wav': 'access=file,mux=wav', 'alac': 'access=file,mux=raw'}
+
+substringTitle = int(sys.argv[1])
+outputExtension = sys.argv[2]
 
 directory = 'out'
 if not os.path.exists(directory):
@@ -29,37 +29,38 @@ for subdir, dirs, files in os.walk('./'):
 		print("extension computed : " + extension)
 		if extension == "flac":
 			print ("file found : " + fileName)
-			if outputFileName + ".mp3" in files:
-				print("Already convert.")
+			if outputFileName + "." + outputExtension in files:
+				print("Already converted.")
 				continue
-			os.system("vlc -I dummy \"" + fileName + ".flac\" \":sout=#transcode{acodec=mpga,ab=192}:std{dst='" + outputFileName + ".mp3',access=file}\" vlc://quit")
-			# MP3
-			mf = MP3(outputFileName + ".mp3", ID3=EasyID3)
-			#FLAC
-			ff = FLAC(fileName + ".flac")
-			#Let's go !
-			try:
-				mf['title'] = ff['title']
-			except:
-				print ("No title")
-			try:
-				mf['artist'] = ff['artist']
-			except:
-				print ("No artist")
-			try:
-				mf['album'] = ff['album']
-			except:
-				print ("No album")
-			try:
-				mf['date'] = ff['date']
-			except:
-				print ("No date")
-			try:
-				mf['genre'] = ff['genre']
-			except:
-				print ("No genre")
-			try:
-				mf['tracknumber'] = ff['tracknumber']
-			except:
-				print ("No genre")
-			mf.save()
+			os.system("vlc -I dummy \"" + fileName + "." + extension + "\" \":sout=#transcode{" + transcode[outputExtension] + "}:std{dst='" + outputFileName + "." + outputExtension + "'," + std[outputExtension] + "}\" vlc://quit")
+			if outputExtension == 'mp3':
+				# MP3
+				mf = MP3(outputFileName + "." + outputExtension, ID3=EasyID3)
+				#FLAC
+				ff = FLAC(fileName + ".flac")
+				#Let's go !
+				try:
+					mf['title'] = ff['title']
+				except:
+					print ("No title")
+				try:
+					mf['artist'] = ff['artist']
+				except:
+					print ("No artist")
+				try:
+					mf['album'] = ff['album']
+				except:
+					print ("No album")
+				try:
+					mf['date'] = ff['date']
+				except:
+					print ("No date")
+				try:
+					mf['genre'] = ff['genre']
+				except:
+					print ("No genre")
+				try:
+					mf['tracknumber'] = ff['tracknumber']
+				except:
+					print ("No genre")
+				mf.save()
