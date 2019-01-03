@@ -3,7 +3,6 @@ from mutagen.flac import FLAC
 from mutagen.easyid3 import EasyID3
 import mutagen.id3
 
-
 import os
 import sys
 
@@ -13,16 +12,31 @@ if len(sys.argv) > 1:
 else:
 	substringTitle = 0
 
+directory = 'out'
+if not os.path.exists(directory):
+    os.makedirs(directory)
+
 for subdir, dirs, files in os.walk('./'):
 	for file in files:
-		plop = file.split(".")
-		if plop[1] == "flac":
-			print ("file found : " + plop[0])
-			os.system("vlc -I dummy \"" + plop[0] + ".flac\" \":sout=#transcode{acodec=mpga,ab=192}:std{dst='" + plop[0][substringTitle:] + ".mp3',access=file}\" vlc://quit")
+		print("file found : " + file)
+		lastDotIndex = file.rfind('.')
+		if lastDotIndex == -1:
+			continue
+		fileName = file[:lastDotIndex]
+		extension = file[lastDotIndex + 1:]
+		outputFileName = os.path.join('out', fileName[substringTitle:].replace("'", ''))
+		print("fileName computed : " + file)
+		print("extension computed : " + extension)
+		if extension == "flac":
+			print ("file found : " + fileName)
+			if outputFileName + ".mp3" in files:
+				print("Already convert.")
+				continue
+			os.system("vlc -I dummy \"" + fileName + ".flac\" \":sout=#transcode{acodec=mpga,ab=192}:std{dst='" + outputFileName + ".mp3',access=file}\" vlc://quit")
 			# MP3
-			mf = MP3(plop[0][substringTitle:] + ".mp3", ID3=EasyID3)
+			mf = MP3(outputFileName + ".mp3", ID3=EasyID3)
 			#FLAC
-			ff = FLAC(plop[0] + ".flac")
+			ff = FLAC(fileName + ".flac")
 			#Let's go !
 			try:
 				mf['title'] = ff['title']
